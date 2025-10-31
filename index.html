@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Appointment System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .hero {
+      background: linear-gradient(to right, #007bff, #6c63ff);
+      color: white;
+    }
+    .doctor-card img {
+      border-radius: 10px;
+      height: 150px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">🏥 Hospital</a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#doctors">Doctors</a></li>
+        <li class="nav-item"><a class="nav-link" href="#book">Book Appointment</a></li>
+        <li class="nav-item"><a class="nav-link" href="#history">History</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero text-center py-5">
+    <h1>Welcome to Our Hospital</h1>
+    <p>Book appointments with top doctors easily</p>
+  </section>
+
+  <!-- Doctors Section -->
+  <section id="doctors" class="container py-5">
+    <h2 class="mb-4 text-center">Our Doctors</h2>
+    <div class="row" id="doctor-list"></div>
+  </section>
+
+  <!-- Book Appointment Form -->
+  <section id="book" class="container py-5">
+    <h2 class="mb-4 text-center">Book an Appointment</h2>
+    <form id="appointment-form">
+      <div class="mb-3">
+        <label for="patient-name" class="form-label">Name</label>
+        <input id="patient-name" class="form-control" required>
+      </div>
+      <div class="mb-3 row">
+        <div class="col">
+          <label for="patient-age">Age</label>
+          <input id="patient-age" type="number" class="form-control">
+        </div>
+        <div class="col">
+          <label for="patient-gender">Gender</label>
+          <select id="patient-gender" class="form-select">
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="patient-email">Email</label>
+        <input id="patient-email" type="email" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="doctor-select">Doctor</label>
+        <select id="doctor-select" class="form-select" required></select>
+      </div>
+      <div class="mb-3">
+        <label for="appointment-date">Date</label>
+        <input id="appointment-date" type="date" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="appointment-time">Time</label>
+        <input id="appointment-time" type="time" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="symptoms">Symptoms</label>
+        <textarea id="symptoms" class="form-control"></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit">Book Appointment</button>
+    </form>
+    <div id="message-box" class="alert mt-3" style="display:none;"></div>
+  </section>
+
+  <!-- Patient History Section -->
+  <section id="history" class="container py-5">
+    <h2 class="mb-4 text-center">Your Appointment History</h2>
+    <input type="text" id="history-patient-id" placeholder="Enter Your Patient ID" class="form-control mb-3">
+    <button id="fetch-history" class="btn btn-primary mb-3">Fetch History</button>
+    <div id="history-list" class="table-responsive"></div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="container py-5">
+    <h2 class="mb-4 text-center">Contact Us</h2>
+    <form id="contact-form">
+      <div class="mb-3">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-control" placeholder="John Doe" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Your Email</label>
+        <input type="email" class="form-control" placeholder="john@example.com" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Your Message</label>
+        <textarea class="form-control" placeholder="Type your message here" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+  </section>
+
+  <script>
+    // Static doctor data
+    const doctors = [
+      { id: 1, name: "Dr. Asha Rao", specialization: "Cardiology", image: "https://randomuser.me/api/portraits/women/45.jpg" },
+      { id: 2, name: "Dr. Ramesh Kumar", specialization: "Neurology", image: "https://randomuser.me/api/portraits/men/46.jpg" },
+      { id: 3, name: "Dr. Priya Mehta", specialization: "Dermatology", image: "https://randomuser.me/api/portraits/women/47.jpg" },
+      { id: 4, name: "Dr. Arjun Das", specialization: "Pediatrics", image: "https://randomuser.me/api/portraits/men/48.jpg" },
+      { id: 5, name: "Dr. Kavya Nair", specialization: "Orthopedics", image: "https://randomuser.me/api/portraits/women/49.jpg" }
+    ];
+
+    // Populate doctor list and dropdown
+    const doctorList = document.getElementById("doctor-list");
+    const doctorSelect = document.getElementById("doctor-select");
+
+    doctors.forEach(doc => {
+      doctorList.innerHTML += `
+        <div class="col-md-4 mb-4">
+          <div class="card doctor-card shadow-sm">
+            <img src="${doc.image}" class="card-img-top" alt="${doc.name}">
+            <div class="card-body text-center">
+              <h5 class="card-title">${doc.name}</h5>
+              <p class="text-muted">${doc.specialization}</p>
+              <p class="text-success fw-bold">Available</p>
+            </div>
+          </div>
+        </div>
+      `;
+      doctorSelect.innerHTML += `<option value="${doc.id}">${doc.name} - ${doc.specialization}</option>`;
+    });
+
+    // Handle form submission
+    document.getElementById("appointment-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const msgBox = document.getElementById("message-box");
+      msgBox.classList.remove("alert-danger");
+      msgBox.classList.add("alert-success");
+      msgBox.innerText = "✅ Appointment Booked Successfully!";
+      msgBox.style.display = "block";
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
